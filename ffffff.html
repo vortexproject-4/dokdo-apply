@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대한민국 독도</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Malgun Gothic',sans-serif;
+}
+
+body{
+    min-height:100vh;
+}
+
+.page{
+    width:100%;
+    min-height:100vh;
+}
+
+#home{
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+
+    background:linear-gradient(
+        -45deg,
+        #001f4d,
+        #0059ff,
+        #00aaff,
+        #0066cc,
+        #003b80
+    );
+
+    background-size:400% 400%;
+    animation:oceanGradient 12s ease infinite;
+}
+
+#home::before{
+    content:"";
+    position:absolute;
+    width:300%;
+    height:300%;
+    top:-100%;
+    left:-100%;
+
+    background:
+    radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 55%),
+    radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 45%);
+
+    animation:waves 18s linear infinite;
+}
+
+@keyframes oceanGradient{
+    0%{
+        background-position:0% 50%;
+    }
+    50%{
+        background-position:100% 50%;
+    }
+    100%{
+        background-position:0% 50%;
+    }
+}
+
+@keyframes waves{
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.overlay{
+    position:relative;
+    z-index:2;
+    background:rgba(0,0,0,0.25);
+    width:100%;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.overlay{
+    background:rgba(0,0,0,0.45);
+    width:100%;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.content{
+    color:white;
+}
+
+.content h1{
+    font-size:60px;
+    margin-bottom:20px;
+    text-shadow:0 0 10px black;
+}
+
+.content p{
+    font-size:22px;
+    margin-bottom:40px;
+}
+
+button{
+    padding:18px 40px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.start-btn{
+    background:#ffffff;
+}
+
+#formPage{
+    display:none;
+    background:#f5f5f5;
+    padding:50px;
+}
+
+.form-container{
+    max-width:700px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 0 15px rgba(0,0,0,0.2);
+}
+
+.form-container h2{
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-top:15px;
+    margin-bottom:5px;
+}
+
+input, textarea, select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+textarea{
+    resize:vertical;
+}
+
+#submitBtn{
+    margin-top:25px;
+    width:100%;
+    background:#0066ff;
+    color:white;
+}
+
+#submitBtn:disabled{
+    background:gray;
+    cursor:not-allowed;
+}
+</style>
+</head>
+<body>
+
+<div id="home" class="page">
+    <div class="overlay">
+        <div class="content">
+            <h1>대한민국 독도에 포널에 오신걸 환영합니다!</h1>
+            <p>독도(https://discord.gg/N6uqCyERBc)에서 로블록스 인게임 개발자 및 관리자를 모집합니다.</p>
+
+            <button class="start-btn" onclick="showForm()">
+                지금 당장 신청하기
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="formPage" class="page">
+
+    <div class="form-container">
+
+        <h2>독도 서버 지원서</h2>
+
+        <label>디스코드 닉네임(ID)</label>
+        <input type="text" id="discord">
+
+        <label>포부</label>
+        <textarea id="goal"></textarea>
+
+        <label>경력</label>
+        <textarea id="career"></textarea>
+
+        <label>어느 분야 신청</label>
+        <select id="position">
+            <option value="">선택</option>
+            <option>개발자</option>
+            <option>관리자</option>
+        </select>
+
+        <label>전과</label>
+        <textarea id="record"></textarea>
+
+        <button id="submitBtn" disabled onclick="submitForm()">
+            제출하기
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+// 여기에 본인 웹훅 넣기
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1518542294670774273/fXQpuYG1n5EZTCysFyF5zashI-Vgzn4wrpazp6Vg8rIrs-0Ah3vfDKTc84BzOQeISayJ";
+
+function showForm(){
+    document.getElementById("home").style.display="none";
+    document.getElementById("formPage").style.display="block";
+}
+
+const fields = [
+    "discord",
+    "goal",
+    "career",
+    "position",
+    "record"
+];
+
+fields.forEach(id=>{
+    document.getElementById(id).addEventListener("input",checkForm);
+});
+
+function checkForm(){
+
+    let filled = true;
+
+    fields.forEach(id=>{
+        if(document.getElementById(id).value.trim()===""){
+            filled=false;
+        }
+    });
+
+    document.getElementById("submitBtn").disabled=!filled;
+}
+
+async function submitForm(){
+
+    const discord =
+        document.getElementById("discord").value;
+
+    const goal =
+        document.getElementById("goal").value;
+
+    const career =
+        document.getElementById("career").value;
+
+    const position =
+        document.getElementById("position").value;
+
+    const record =
+        document.getElementById("record").value;
+
+    const payload = {
+        embeds:[
+            {
+                title:"📋 새로운 독도 지원서",
+                color:3447003,
+                fields:[
+                    {
+                        name:"디스코드 닉네임(ID)",
+                        value:discord
+                    },
+                    {
+                        name:"포부",
+                        value:goal
+                    },
+                    {
+                        name:"경력",
+                        value:career
+                    },
+                    {
+                        name:"신청 분야",
+                        value:position
+                    },
+                    {
+                        name:"전과",
+                        value:record
+                    }
+                ],
+                footer:{
+                    text:"대한민국 독도 지원 시스템"
+                },
+                timestamp:new Date().toISOString()
+            }
+        ]
+    };
+
+    try{
+
+        const res = await fetch(WEBHOOK_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(payload)
+        });
+
+        if(res.ok){
+            alert("신청서가 성공적으로 제출되었습니다!");
+            location.reload();
+        }else{
+            alert("전송 실패");
+        }
+
+    }catch(err){
+        alert("오류 발생");
+    }
+}
+</script>
+
+</body>
+</html>
